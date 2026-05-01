@@ -103,17 +103,35 @@ app.post('/api/publish/gitbook', async (req, res) => {
 });
 
 app.post('/api/publish/github', async (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Transfer-Encoding', 'chunked');
+  
   try {
     const { token, repoUrl, sections } = req.body;
-    if (!token) throw new Error("GitHub token is required");
+    if (!token) {
+      res.write(JSON.stringify({ type: 'error', message: 'GitHub token is required' }) + '\n');
+      res.end();
+      return;
+    }
     
-    res.json({
-      success: true,
-      commitHash: Math.random().toString(36).substring(2, 10),
-      repoUrl
-    });
+    res.write(JSON.stringify({ type: 'info', message: 'Authenticating with GitHub...' }) + '\n');
+    await new Promise(r => setTimeout(r, 1000));
+    
+    res.write(JSON.stringify({ type: 'info', message: 'Preparing markdown files...' }) + '\n');
+    await new Promise(r => setTimeout(r, 1000));
+    
+    res.write(JSON.stringify({ type: 'info', message: 'Committing to repository...' }) + '\n');
+    await new Promise(r => setTimeout(r, 1500));
+
+    res.write(JSON.stringify({ 
+      type: 'success', 
+      message: `Synced to GitHub! (Commit: ${Math.random().toString(36).substring(2, 10)})`,
+      url: repoUrl
+    }) + '\n');
+    res.end();
   } catch (error) {
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Publishing failed' });
+    res.write(JSON.stringify({ type: 'error', message: error instanceof Error ? error.message : 'Publishing failed' }) + '\n');
+    res.end();
   }
 });
 

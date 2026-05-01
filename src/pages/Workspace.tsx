@@ -54,7 +54,7 @@ export default function Workspace() {
 
   const pushToGitbook = async () => {
     setPublishing(true);
-    setPublishStatus(null);
+    setPublishStatus({ type: 'info', message: 'Publishing to GitBook...' });
     try {
       const res = await fetch('/api/publish/gitbook', {
         method: 'POST',
@@ -78,7 +78,7 @@ export default function Workspace() {
 
   const syncToGithub = async () => {
     setPublishing(true);
-    setPublishStatus(null);
+    setPublishStatus({ type: 'info', message: 'Starting GitHub sync...' });
     try {
       const res = await fetch('/api/publish/github', {
         method: 'POST',
@@ -89,9 +89,28 @@ export default function Workspace() {
           sections: state.sections
         })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setPublishStatus({ type: 'success', message: `Synced to GitHub! (Commit: ${data.commitHash})`, url: data.repoUrl });
+      
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('Response body is unavailable');
+
+      const decoder = new TextDecoder('utf-8');
+      
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n').filter(Boolean);
+        
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line);
+            setPublishStatus(data);
+          } catch (err) {
+            console.error('Error parsing JSON chunk:', err);
+          }
+        }
+      }
     } catch (err: any) {
       setPublishStatus({ type: 'error', message: err.message });
     } finally {
@@ -166,8 +185,14 @@ export default function Workspace() {
       </header>
 
       {publishStatus && (
-        <div className={`p-3 rounded-lg mb-4 text-sm font-medium flex items-center space-x-2 ${publishStatus.type === 'error' ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'}`}>
-          {publishStatus.type === 'error' ? <AlertCircle size={16} /> : <Check size={16} />}
+        <div className={`p-3 rounded-lg mb-4 text-sm font-medium flex items-center space-x-2 
+          ${publishStatus.type === 'error' ? 'bg-red-500/10 text-red-500' : 
+            publishStatus.type === 'success' ? 'bg-green-500/10 text-green-500' : 
+            'bg-blue-500/10 text-blue-500'}
+        `}>
+          {publishStatus.type === 'error' ? <AlertCircle size={16} /> : 
+           publishStatus.type === 'success' ? <Check size={16} /> : 
+           <RefreshCw size={16} className="animate-spin" />}
           <span>{publishStatus.message}</span>
           {publishStatus.url && (
             <a href={publishStatus.url} target="_blank" rel="noreferrer" className="underline ml-2">View</a>

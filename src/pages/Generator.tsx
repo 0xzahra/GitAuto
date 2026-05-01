@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppContext } from '../contexts/AppContext';
+import { UploadCloud, Image as ImageIcon, X } from 'lucide-react';
 
 export default function Generator() {
   const { state, updateIdentity, updateTechnical, updateBrand, updateGitbook } = useAppContext();
@@ -18,6 +19,28 @@ export default function Generator() {
 
   const handleBack = () => {
     if (step > 1) setStep(step - 1);
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateBrand({ logoUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleMediaKitUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateBrand({ mediaKit: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -171,14 +194,38 @@ export default function Generator() {
               <h3 className="text-2xl font-bold">Brand & Media</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold mb-2">Media Kit URL (Optional)</label>
-                  <input 
-                    type="url" 
-                    className="opus-input" 
-                    value={state.brand.mediaKit}
-                    onChange={e => updateBrand({ mediaKit: e.target.value })}
-                    placeholder="Link to assets"
-                  />
+                  <label className="block text-sm font-bold mb-2">Media Kit (URL or Upload)</label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                       {state.brand.mediaKit?.startsWith('data:') ? (
+                         <div className="opus-input flex items-center justify-between">
+                           <span className="truncate text-[var(--accent-primary)] font-medium text-sm">Media File Attached</span>
+                           <button type="button" onClick={() => updateBrand({ mediaKit: '' })} className="text-[var(--text-secondary)] hover:text-red-500 transition-colors">
+                             <X size={16} />
+                           </button>
+                         </div>
+                       ) : (
+                         <input 
+                          type="url" 
+                          className="opus-input" 
+                          value={state.brand.mediaKit}
+                          onChange={e => updateBrand({ mediaKit: e.target.value })}
+                          placeholder="Link to assets..."
+                        />
+                       )}
+                    </div>
+                    {!state.brand.mediaKit?.startsWith('data:') && (
+                      <label className="opus-button opus-button-secondary flex items-center justify-center px-4 cursor-pointer flex-shrink-0">
+                        <UploadCloud size={18} className="mr-2" />
+                        <span className="text-sm font-bold hidden sm:inline">Upload</span>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          onChange={handleMediaKitUpload}
+                        />
+                      </label>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -199,15 +246,42 @@ export default function Generator() {
                       />
                     </div>
                   </div>
-                   <div>
-                    <label className="block text-sm font-bold mb-2">Logo URL (Optional)</label>
-                    <input 
-                      type="url" 
-                      className="opus-input" 
-                      value={state.brand.logoUrl}
-                      onChange={e => updateBrand({ logoUrl: e.target.value })}
-                      placeholder="https..."
-                    />
+                   <div className="flex flex-col">
+                    <label className="block text-sm font-bold mb-2">Project Logo</label>
+                    <div className="flex items-center space-x-4">
+                      {state.brand.logoUrl ? (
+                        <div className="relative w-16 h-16 rounded-xl border border-[var(--border-color)] overflow-hidden bg-black/10 dark:bg-white/10 flex items-center justify-center">
+                          <img src={state.brand.logoUrl} alt="Logo preview" className="max-w-full max-h-full object-contain p-1" />
+                          <button 
+                            type="button"
+                            onClick={() => updateBrand({ logoUrl: '' })}
+                            className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-200 uppercase text-[10px] font-bold"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-16 h-16 rounded-xl border border-dashed border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)]">
+                          <ImageIcon size={24} />
+                        </div>
+                      )}
+                      
+                      <div className="flex-1">
+                        <label className="opus-button opus-button-secondary text-sm inline-flex items-center justify-center px-4 py-2 cursor-pointer w-full text-center">
+                          <UploadCloud size={16} className="mr-2" />
+                          <span>Upload Image</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={handleLogoUpload}
+                          />
+                        </label>
+                        <p className="text-[10px] text-[var(--text-secondary)] mt-2 ml-1 text-center">
+                          PNG, JPG, or SVG up to 2MB.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div>
