@@ -1,0 +1,6 @@
+{
+  "name": "GitAuto",
+  "description": "Technical documentation generator that connects to GitBook and GitHub.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
