@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "A GitAuto documentation project",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "identity": { "type": "object" },
+        "technical": { "type": "object" },
+        "brand": { "type": "object" },
+        "sections": { "type": "array" },
+        "isDeleted": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "identity", "technical", "brand", "sections", "isDeleted", "createdAt", "updatedAt"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Log of actions performed on projects",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "projectId": { "type": "string" },
+        "action": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "projectId", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": { "$ref": "Project" },
+      "description": "Stores user projects containing all generator states"
+    },
+    "/activityLogs/{logId}": {
+      "schema": { "$ref": "ActivityLog" },
+      "description": "Stores activity/version history"
+    }
+  }
+}

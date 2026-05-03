@@ -84,7 +84,10 @@ export default function Generator() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6 form-step"
             >
-              <h3 className="text-2xl font-bold">Project Identity</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold">Project Identity</h3>
+                <button type="button" onClick={() => useAppContext().eraseIdentity()} className="text-xs text-[var(--text-secondary)] hover:text-red-500 uppercase tracking-widest font-bold flex items-center gap-1"><X size={12} /> Erase</button>
+              </div>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-bold mb-2">Project Name</label>
@@ -138,7 +141,10 @@ export default function Generator() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <h3 className="text-2xl font-bold">Technical Inputs</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold">Technical Inputs</h3>
+                <button type="button" onClick={() => useAppContext().eraseTechnical()} className="text-xs text-[var(--text-secondary)] hover:text-red-500 uppercase tracking-widest font-bold flex items-center gap-1"><X size={12} /> Erase</button>
+              </div>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-bold mb-2">Code Project URL(s)</label>
@@ -191,7 +197,10 @@ export default function Generator() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <h3 className="text-2xl font-bold">Brand & Media</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold">Brand & Media</h3>
+                <button type="button" onClick={() => useAppContext().eraseBrand()} className="text-xs text-[var(--text-secondary)] hover:text-red-500 uppercase tracking-widest font-bold flex items-center gap-1"><X size={12} /> Erase</button>
+              </div>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-bold mb-2">Media Kit (URL or Upload)</label>

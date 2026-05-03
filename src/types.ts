@@ -35,6 +35,7 @@ export interface DocumentSection {
 }
 
 export interface AppState {
+  projectId?: string;
   identity: ProjectIdentity;
   technical: TechnicalInputs;
   brand: BrandMedia;

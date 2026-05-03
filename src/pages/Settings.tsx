@@ -25,23 +25,29 @@ export default function Settings() {
           </p>
           
           {user ? (
-            <div className="flex items-center justify-between p-4 rounded-xl bg-black/10 dark:bg-white/5 border border-[#ffffff10]">
-              <div className="flex items-center space-x-4">
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="w-12 h-12 rounded-full border-2 border-[var(--accent-primary)]" />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-[var(--accent-primary)]/20 flex items-center justify-center text-[var(--accent-primary)] font-bold text-xl">
-                    {user.email?.[0].toUpperCase() || 'U'}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-black/10 dark:bg-white/5 border border-[#ffffff10]">
+                <div className="flex items-center space-x-4">
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt="Profile" className="w-12 h-12 rounded-full border-2 border-[var(--accent-primary)]" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-[var(--accent-primary)]/20 flex items-center justify-center text-[var(--accent-primary)] font-bold text-xl">
+                      {user.email?.[0].toUpperCase() || 'U'}
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-bold text-[var(--text-primary)]">{user.displayName || 'Connected User'}</div>
+                    <div className="text-sm text-[var(--text-secondary)]">{user.email}</div>
                   </div>
-                )}
-                <div>
-                  <div className="font-bold text-[var(--text-primary)]">{user.displayName || 'Connected User'}</div>
-                  <div className="text-sm text-[var(--text-secondary)]">{user.email}</div>
                 </div>
+                <button onClick={signOut} className="opus-button bg-red-500/10 text-red-500 hover:bg-red-500/20 px-4 py-2 flex items-center space-x-2 text-sm">
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
               </div>
-              <button onClick={signOut} className="opus-button bg-red-500/10 text-red-500 hover:bg-red-500/20 px-4 py-2 flex items-center space-x-2 text-sm">
-                <LogOut size={16} />
-                <span>Sign Out</span>
+              <button onClick={signInWithGithub} className="opus-button bg-[#24292e] text-white hover:bg-[#2c3137] w-full px-4 py-3 flex items-center justify-center space-x-2">
+                <Github size={20} />
+                <span className="font-bold">Connect GitHub Account</span>
               </button>
             </div>
           ) : (
@@ -111,6 +117,30 @@ export default function Settings() {
                 placeholder="https://github.com/org/repo"
               />
             </div>
+          </div>
+        </div>
+        <div className="opus-card p-6 md:p-8">
+          <h3 className="text-xl font-bold mb-4">Support the Developer</h3>
+          <p className="text-sm text-[var(--text-secondary)] mb-6">
+            If you find this project useful, consider supporting the developer via crypto:
+          </p>
+          <div className="space-y-4 text-sm font-mono text-[var(--text-secondary)] break-all max-h-64 overflow-y-auto pr-2">
+            <div><strong className="text-[var(--text-primary)] font-sans">₿:</strong> 38vsxixBp1DzDuJ4J3re1rTERBzJ6au27a</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Bitcoin:</strong> techbro.btc</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Fractal unisat:</strong> bc1qncuzw003jsnys5fq00jx3gxsdurp740zn0vzlh</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Universal (no expiry):</strong> zahrah.nft, zahranft1.crypto</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Arewa.eth:</strong> 0xb022b646724e3db39ec7b725de95b37e2a971a27</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Ethereum:</strong> arewa.eth</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Zahranft1.crypto:</strong> 0xc5c2bc5b9f11336d8ae79bb67ba7a21d0b825457</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Farcaster base:</strong> 0xEBB6466D179bed52B00a1d186a7c26b35a635D5e</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Base chain:</strong> arewa.base.eth</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Base app:</strong> 0xB6E30c3B7dD1fb09A3d2D4CDC94ac0a0bA961161</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Main Sol wallet:</strong> G4MdPDCZ98MApcQSFsC6AButjL7Jb4kS8mVoFqXFVsTS</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Sol wallets:</strong> 7rcNCvxKdoSB9uZsPmbUQ3kucZ1rMDxQc34o5arictht, FMNn2BdyV24imiL1GVmEBgDQe4U6UiSC8ntwGuXbAyAV, pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Aptos:</strong> 0x5320f25f7671012e716889491affa7625797d576429134126de490d5cfee05c9</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Near protocol:</strong> zahrah.near</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">TON network:</strong> realwordasset.ton</div>
+            <div><strong className="text-[var(--text-primary)] font-sans">Tether:</strong> artemis0@tether.me</div>
           </div>
         </div>
       </div>

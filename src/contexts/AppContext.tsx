@@ -8,6 +8,13 @@ interface AppContextType {
   updateBrand: (data: Partial<AppState['brand']>) => void;
   updateGitbook: (data: Partial<AppState['gitbook']>) => void;
   updateSection: (id: string, data: Partial<DocumentSection>) => void;
+  eraseIdentity: () => void;
+  eraseTechnical: () => void;
+  eraseBrand: () => void;
+  eraseSections: () => void;
+  eraseAll: () => void;
+  setAllState: (state: Partial<AppState>) => void;
+  updateProjectId: (projectId: string) => void;
   addGeneratedDocToStats: () => void;
   getStats: () => any;
 }
@@ -60,6 +67,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const eraseIdentity = () => setState(s => ({ ...s, identity: defaultState.identity }));
+  const eraseTechnical = () => setState(s => ({ ...s, technical: defaultState.technical }));
+  const eraseBrand = () => setState(s => ({ ...s, brand: defaultState.brand }));
+  const eraseSections = () => setState(s => ({ ...s, sections: defaultState.sections }));
+  const eraseAll = () => setState(s => ({ ...s, projectId: undefined, identity: defaultState.identity, technical: defaultState.technical, brand: defaultState.brand, sections: defaultState.sections }));
+  const setAllState = (newState: Partial<AppState>) => setState(s => ({ ...s, ...newState }));
+  const updateProjectId = (projectId: string) => setState(s => ({ ...s, projectId }));
+
   const addGeneratedDocToStats = () => {
     const statsStr = localStorage.getItem('gitauto_stats') || '{"history":[]}';
     const stats = JSON.parse(statsStr);
@@ -74,7 +89,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      state, updateIdentity, updateTechnical, updateBrand, updateGitbook, updateSection, addGeneratedDocToStats, getStats
+      state, updateIdentity, updateTechnical, updateBrand, updateGitbook, updateSection, 
+      eraseIdentity, eraseTechnical, eraseBrand, eraseSections, eraseAll, setAllState,
+      updateProjectId,
+      addGeneratedDocToStats, getStats
     }}>
       {children}
     </AppContext.Provider>

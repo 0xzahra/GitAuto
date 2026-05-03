@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Home, FileText, Settings, BarChart2, Sun, Moon, PlusCircle } from 'lucide-react';
+import { Home, FileText, Settings, BarChart2, Sun, Moon, PlusCircle, FolderClosed, Trash2, Activity } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import OnboardingTour from './OnboardingTour';
 
@@ -10,6 +10,7 @@ export default function Layout() {
 
   const navItems = [
     { name: 'Home', icon: Home, path: '/' },
+    { name: 'Projects', icon: FolderClosed, path: '/projects' },
     { name: 'New Document', icon: PlusCircle, path: '/generator' },
     { name: 'Workspace', icon: FileText, path: '/workspace' },
     { name: 'Analytics', icon: BarChart2, path: '/analytics' },

@@ -1,18 +1,43 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { Download, RefreshCw, UploadCloud, Github, Check, AlertCircle } from 'lucide-react';
+import { Download, RefreshCw, UploadCloud, Github, Check, AlertCircle, Save, Folder } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
+import { useAuth } from '../contexts/AuthContext';
+import { createProject, updateProject } from '../lib/db';
 import { DocumentSection } from '../types';
 
 export default function Workspace() {
-  const { state, updateSection, addGeneratedDocToStats } = useAppContext();
+  const navigate = useNavigate();
+  const { state, updateSection, updateProjectId, addGeneratedDocToStats } = useAppContext();
+  const { user } = useAuth();
   const [activeSectionId, setActiveSectionId] = useState(state.sections[0].id);
   const [publishing, setPublishing] = useState(false);
   const [publishStatus, setPublishStatus] = useState<any>(null);
 
   const activeSection = state.sections.find(s => s.id === activeSectionId) || state.sections[0];
+
+  const handleSave = async () => {
+    if (!user) {
+      setPublishStatus({ type: 'error', message: 'You must be logged in to save.' });
+      return;
+    }
+    setPublishStatus({ type: 'info', message: 'Saving project...' });
+    try {
+      if (state.projectId) {
+        await updateProject(state.projectId, state.identity.name, state.identity, state.technical, state.brand, state.sections);
+      } else {
+        const newId = await createProject(state.identity.name, state.identity, state.technical, state.brand, state.sections);
+        if (newId) updateProjectId(newId);
+      }
+      setPublishStatus({ type: 'success', message: 'Project saved to cloud!' });
+      setTimeout(() => setPublishStatus(null), 3000);
+    } catch (err: any) {
+      setPublishStatus({ type: 'error', message: err.message });
+    }
+  };
 
   const generateSection = async (section: DocumentSection) => {
     updateSection(section.id, { status: 'generating' });
@@ -148,6 +173,18 @@ export default function Workspace() {
         </div>
         <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
           <div className="hidden lg:flex items-center gap-2">
+            <button 
+              onClick={() => navigate('/projects')}
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 uppercase font-bold tracking-wider mr-2"
+            >
+              <Folder size={14} /> Projects
+            </button>
+            <button 
+              onClick={handleSave}
+              className="text-xs text-[var(--accent-primary)] hover:opacity-80 flex items-center gap-1 uppercase font-bold tracking-wider mr-2"
+            >
+              <Save size={14} /> Save
+            </button>
             <button 
               onClick={handleRegenerateAll}
               className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 uppercase font-bold tracking-wider mr-2"

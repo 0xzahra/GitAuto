@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, Clock, CalendarDays, BarChart } from 'lucide-react';
+import ActivityLog from './ActivityLog';
 
 export default function Analytics() {
   const { getStats } = useAppContext();
@@ -104,7 +105,7 @@ export default function Analytics() {
 
       <div className="opus-glass p-6 md:p-8 h-[400px]">
         <h3 className="text-lg font-bold mb-6">Generations Last 7 Days</h3>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="80%">
           <LineChart data={stats.chartData} margin={{ top: 5, right: 20, bottom: 20, left: 0 }}>
              <XAxis 
                dataKey="date" 
@@ -137,6 +138,10 @@ export default function Analytics() {
              />
           </LineChart>
         </ResponsiveContainer>
+      </div>
+
+      <div className="mt-8">
+        <ActivityLog />
       </div>
     </div>
   );
