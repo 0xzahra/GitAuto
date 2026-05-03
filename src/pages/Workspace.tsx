@@ -59,7 +59,7 @@ export default function Workspace() {
       if (!res.ok) throw new Error(data.error);
 
       updateSection(section.id, { 
-        content: data.content.replace(/^```markdown\\n|```$/g, ''), // Strip markdown block wrapper if present
+        content: String(data.content || '').replace(/^```markdown\\n|```$/g, ''), // Strip markdown block wrapper if present
         status: 'done' 
       });
       addGeneratedDocToStats();

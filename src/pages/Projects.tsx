@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getActiveProjects, softDeleteProject, ProjectData } from '../lib/db';
+import { getActiveProjects, softDeleteProject, createProject, ProjectData } from '../lib/db';
 import { auth } from '../lib/firebase';
 import { useAppContext } from '../contexts/AppContext';
-import { FileText, Plus, Trash2, Edit2, Share2, Clock, Check } from 'lucide-react';
+import { FileText, Plus, Trash2, Edit2, Share2, Clock, Check, Download, Copy, Eye } from 'lucide-react';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 export default function Projects() {
   const [projects, setProjects] = useState<ProjectData[]>([]);
@@ -23,7 +25,20 @@ export default function Projects() {
     setLoading(false);
   };
 
+  const handleView = (project: ProjectData) => {
+    if (!window.confirm(`Are you sure you want to view "${project.name || 'this project'}" in the workspace?`)) return;
+    setAllState({
+      projectId: project.id,
+      identity: project.identity,
+      technical: project.technical,
+      brand: project.brand,
+      sections: project.sections,
+    });
+    navigate('/workspace');
+  }
+
   const handleEdit = (project: ProjectData) => {
+    if (!window.confirm(`Are you sure you want to edit "${project.name || 'this project'}"? Current workspace data will be overwritten.`)) return;
     setAllState({
       projectId: project.id,
       identity: project.identity,
@@ -35,16 +50,35 @@ export default function Projects() {
     navigate('/workspace');
   };
 
-  const handleDelete = async (id: string) => {
-    await softDeleteProject(id);
-    setProjects(projects.filter(p => p.id !== id));
+  const handleDuplicate = async (project: ProjectData) => {
+    if (!window.confirm(`Are you sure you want to duplicate "${project.name || 'this project'}"?`)) return;
+    setLoading(true);
+    await createProject(`${project.name || 'Untitled Project'} (Copy)`, project.identity, project.technical, project.brand, project.sections);
+    await loadProjects();
   };
 
-  const handleShare = (id: string) => {
+  const handleDownload = async (project: ProjectData) => {
+    if (!window.confirm(`Are you sure you want to download "${project.name || 'this project'}" as a ZIP file?`)) return;
+    const zip = new JSZip();
+    project.sections.forEach(s => {
+       zip.file(`${s.title}.md`, s.content || '');
+    });
+    const blob = await zip.generateAsync({ type: 'blob' });
+    saveAs(blob, `${project.name || 'project'}-docs.zip`);
+  };
+
+  const handleDelete = async (project: ProjectData) => {
+    if (!window.confirm(`Are you sure you want to move "${project.name || 'this project'}" to trash?`)) return;
+    await softDeleteProject(project.id);
+    setProjects(projects.filter(p => p.id !== project.id));
+  };
+
+  const handleShare = (project: ProjectData) => {
+    if (!window.confirm(`Are you sure you want to generate a share link for "${project.name || 'this project'}"?`)) return;
     // In a real app, this would share a unique public link
-    const url = `${window.location.origin}/preview/${id}`;
+    const url = `${window.location.origin}/preview/${project.id}`;
     navigator.clipboard.writeText(url);
-    setCopiedId(id);
+    setCopiedId(project.id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -119,24 +153,45 @@ export default function Projects() {
               </div>
               
               <div className="flex justify-between items-center p-3 bg-black/5 dark:bg-white/5">
-                <div className="flex space-x-2">
+                <div className="flex space-x-1">
+                  <button 
+                    onClick={() => handleView(project)}
+                    className="p-2 text-[var(--text-secondary)] hover:text-blue-400 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                    title="View Document"
+                  >
+                    <Eye size={16} />
+                  </button>
                   <button 
                     onClick={() => handleEdit(project)}
-                    className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
-                    title="Edit/View Workspace"
+                    className="p-2 text-[var(--text-secondary)] hover:text-green-400 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                    title="Edit Document"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button 
-                    onClick={() => handleShare(project.id)}
-                    className="p-2 text-[var(--text-secondary)] hover:text-green-500 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                    onClick={() => handleDuplicate(project)}
+                    className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                    title="Duplicate Document"
+                  >
+                    <Copy size={16} />
+                  </button>
+                  <button 
+                    onClick={() => handleDownload(project)}
+                    className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                    title="Download ZIP"
+                  >
+                    <Download size={16} />
+                  </button>
+                  <button 
+                    onClick={() => handleShare(project)}
+                    className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
                     title="Share Link"
                   >
                     {copiedId === project.id ? <Check size={16} className="text-green-500" /> : <Share2 size={16} />}
                   </button>
                 </div>
                 <button 
-                  onClick={() => handleDelete(project.id)}
+                  onClick={() => handleDelete(project)}
                   className="p-2 text-[var(--text-secondary)] hover:text-red-500 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
                   title="Move to Trash"
                 >

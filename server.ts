@@ -52,10 +52,11 @@ app.post('/api/generate-section', async (req, res) => {
       }
     });
 
-    res.json({ content: response.text });
+    const contentText = response.text || '';
+    res.json({ content: contentText });
   } catch (error) {
     console.error('Error in generation:', error);
-    res.status(500).json({ error: 'Failed to generate content' });
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to generate content' });
   }
 });
 
